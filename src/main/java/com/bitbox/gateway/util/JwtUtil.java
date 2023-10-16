@@ -51,10 +51,10 @@ public class JwtUtil {
     public void addJwtPayloadHeaders(ServerHttpRequest request, Claims claims) {
         request.mutate()
                 .header("Content-Type", "application/json;charset=UTF-8")
-                .header("member_id", getMemberId(claims))
-                .header("member_authority", getMemberAuthority(claims))
-                .header("class_id", String.valueOf(getClassId(claims))) // header에 long이 안되네? null이면 "null"로 들어가긴 함 (NPE X)
-                .header("member_nickname", getMemberNickname(claims))
+                .header("memberId", getMemberId(claims))
+                .header("memberAuthority", getMemberAuthority(claims))
+                .header("classId", String.valueOf(getClassId(claims))) // header에 long이 안되네? null이면 "null"로 들어가긴 함 (NPE X)
+                .header("memberNickname", getMemberNickname(claims))
                 .build();
     }
 }
