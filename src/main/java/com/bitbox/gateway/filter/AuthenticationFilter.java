@@ -4,9 +4,7 @@ import com.bitbox.gateway.util.JwtUtil;
 import io.jsonwebtoken.Claims;
 import org.apache.http.HttpHeaders;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
-import org.springframework.cloud.gateway.filter.OrderedGatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
-import org.springframework.core.Ordered;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.http.server.reactive.ServerHttpResponse;
@@ -29,7 +27,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
 
     @Override
     public GatewayFilter apply(Config config) {
-        return new OrderedGatewayFilter((exchange, chain) -> {
+        return ((exchange, chain) -> {
             ServerHttpRequest request = exchange.getRequest();
             ServerHttpResponse response = exchange.getResponse();
 
@@ -45,7 +43,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             jwtUtil.addJwtPayloadHeaders(request, claims);
 
             return chain.filter(exchange);
-        }, Ordered.HIGHEST_PRECEDENCE);
+        });
     }
 
     private boolean containsAuthorization(ServerHttpRequest request) {
@@ -53,7 +51,7 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
     }
 
     private boolean isExpired(Claims claims) {
-        return claims.getExpiration().getTime() > System.currentTimeMillis();
+        return claims.getExpiration().getTime() < System.currentTimeMillis();
     }
 
     private String getJwt(ServerHttpRequest request) {
