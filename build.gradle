@@ -26,6 +26,11 @@ dependencies {
 	implementation group: 'org.springframework.cloud', name: 'spring-cloud-starter-bootstrap'
 	implementation group: 'io.micrometer', name: 'micrometer-registry-prometheus'
 	implementation 'org.springframework.boot:spring-boot-starter-actuator'
+	implementation group: 'io.github.lotteon2', name: 'bitbox', version: '0.0.4' // -> 버전 증가 필요
+
+	implementation 'io.jsonwebtoken:jjwt:0.9.1'
+	implementation 'javax.xml.bind:jaxb-api:2.3.1'
+
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	annotationProcessor 'org.projectlombok:lombok'
