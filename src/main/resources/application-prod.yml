@@ -1,0 +1,6 @@
+spring:
+  config:
+    import: ${CONFIG_SERVER}
+  cloud:
+    config:
+      name: apigateway-service
