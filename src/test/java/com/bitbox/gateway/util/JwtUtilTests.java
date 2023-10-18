@@ -24,10 +24,10 @@ public class JwtUtilTests {
     void parseJwtTest() {
         Claims claims = jwtUtil.parse(testJwt);
 
-        assert claims.get("member_id", String.class).equals("UUID");
-        assert claims.get("member_nickname", String.class).equals("manager");
-        assert claims.get("class_id", Long.class) == null;
+        assert claims.get("memberId", String.class).equals("UUID");
+        assert claims.get("memberNickname", String.class).equals("manager");
+        assert claims.get("classId", Long.class) == null;
         assert claims.getExpiration().getTime() > System.currentTimeMillis();
-        assert claims.get("member_authority", String.class).equals(AuthorityType.MANAGER.name());
+        assert claims.get("memberAuthority", String.class).equals(AuthorityType.MANAGER.name());
     }
 }
