@@ -44,6 +44,10 @@ public class JwtUtil {
         return claims.get("class_id", Long.class);
     }
 
+    private String getMemberProfileImg(Claims claims) {
+        return claims.get("member_profile_img", String.class);
+    }
+
     private String getMemberAuthority(Claims claims) {
         return claims.get("member_authority", String.class);
     }
@@ -55,6 +59,7 @@ public class JwtUtil {
                 .header("memberAuthority", getMemberAuthority(claims))
                 .header("classId", String.valueOf(getClassId(claims))) // header에 long이 안되네? null이면 "null"로 들어가긴 함 (NPE X)
                 .header("memberNickname", getMemberNickname(claims))
+                .header("memberProfileImg", getMemberProfileImg(claims))
                 .build();
     }
 }
