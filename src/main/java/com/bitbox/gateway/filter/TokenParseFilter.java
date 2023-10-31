@@ -12,15 +12,14 @@ import org.springframework.stereotype.Component;
 import reactor.core.publisher.Mono;
 
 @Component
-public class AuthenticationFilter extends AbstractGatewayFilterFactory<AuthenticationFilter.Config> {
-
+public class TokenParseFilter extends AbstractGatewayFilterFactory<TokenParseFilter.Config> {
     private final JwtUtil jwtUtil;
 
     public static class Config {
 
     }
 
-    public AuthenticationFilter(JwtUtil jwtUtil) {
+    public TokenParseFilter(JwtUtil jwtUtil) {
         super(Config.class);
         this.jwtUtil = jwtUtil;
     }
@@ -31,17 +30,19 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
             ServerHttpRequest request = exchange.getRequest();
             ServerHttpResponse response = exchange.getResponse();
 
-            if(!containsAuthorization(request) || getJwt(request).isBlank()) {
-                return onError(response, HttpStatus.UNAUTHORIZED);
+            // 로그인 시에만 토큰 Parse
+            if(containsAuthorization(request) && !getJwt(request).isBlank()) {
+                Claims claims = jwtUtil.parse(getJwt(request));
+                if(isExpired(claims)) {
+                    return onError(response, HttpStatus.UNAUTHORIZED);
+                }
+
+                jwtUtil.addJwtPayloadHeaders(request, claims);
+
+                return chain.filter(exchange);
             }
 
-            Claims claims = jwtUtil.parse(getJwt(request));
-            if(isExpired(claims)) {
-                return onError(response, HttpStatus.UNAUTHORIZED);
-            }
-
-            jwtUtil.addJwtPayloadHeaders(request, claims);
-
+            // 비로그인 시 그냥 통과.
             return chain.filter(exchange);
         });
     }
