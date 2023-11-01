@@ -1,5 +1,235 @@
+server:
+  port: 8000
+
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+
 spring:
+  application:
+    name: apigateway-service
   cloud:
-    config:
-      url: http://127.0.0.1:8888
-      name: apigateway-service
+    gateway:
+      default-filters:
+        - DedupeResponseHeader=Access-Control-Allow-Origin Access-Control-Allow-Credentials
+      globalcors:
+        cors-configurations:
+          "[/**]":
+            allowedOrigins:
+              - "https://velvety-pixie-6c6373.netlify.app"
+              - "https://ephemeral-valkyrie-b2a791.netlify.app"
+              - "http://localhost:3000"
+              - "http://localhost:3001"
+            allow-credentials: true
+            allowedHeaders: "*"
+            allowedMethods:
+              - PUT
+              - GET
+              - POST
+              - DELETE
+              - PATCH
+              - OPTIONS
+      routes:
+        - id: chatting-service
+          uri: lb://CHATTING-SERVICE
+          predicates:
+            - Path=/chatting-service/chattings/**
+          filters:
+            - RewritePath=/chatting-service/(?<segment>.*), /$\{segment}
+            - SocketAuthenticationFilter
+
+        - id: chatting-service
+          uri: lb://CHATTING-SERVICE
+          predicates:
+            - Path=/chatting-service/**
+          filters:
+            - RewritePath=/chatting-service/(?<segment>.*), /$\{segment}
+            - AuthenticationFilter
+
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payment-service/payments/**
+          filters:
+            - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
+        - id: payment-service
+          uri: lb://PAYMENT-SERVICE
+          predicates:
+            - Path=/payment-service/**
+          filters:
+            - RewritePath=/payment-service/(?<segment>.*), /$\{segment}
+            - AuthenticationFilter
+
+
+        - id: admin-service
+          uri: lb://ADMIN-SERVICE
+          predicates:
+            - Path=/admin-service/admin/grade/mygrade
+            - Method=GET,OPTIONS
+          filters:
+            - RewritePath=/admin-service/(?<segment>.*), /$\{segment}
+            - AuthenticationFilter
+        - id: admin-service
+          uri: lb://ADMIN-SERVICE
+          predicates:
+            - Path=/admin-service/admin
+            - Method=PATCH,OPTIONS
+          filters:
+            - RewritePath=/admin-service/(?<segment>.*), /$\{segment}
+            - AuthenticationFilter
+            - IsAdminManagerTeacherFilter
+        - id: admin-service
+          uri: lb://ADMIN-SERVICE
+          predicates:
+            - Path=/admin-service/admin
+            - Method=PUT,OPTIONS
+          filters:
+            - RewritePath=/admin-service/(?<segment>.*), /$\{segment}
+            - AuthenticationFilter
+            - IsAdminManagerFilter
+        - id: admin-service
+          uri: lb://ADMIN-SERVICE
+          predicates:
+            - Path=/admin-service/admin/one
+            - Method=GET,OPTIONS
+          filters:
+            - RewritePath=/admin-service/(?<segment>.*), /$\{segment}
+            - AuthenticationFilter
+            - IsAdminManagerTeacherFilter
+        - id: admin-service
+          uri: lb://ADMIN-SERVICE
+          predicates:
+            - Path=/admin-service/admin/grade/**,/admin-service/admin/exam/**
+          filters:
+            - RewritePath=/admin-service/(?<segment>.*), /$\{segment}
+            - AuthenticationFilter
+            - IsAdminManagerTeacherFilter
+        - id: admin-service
+          uri: lb://ADMIN-SERVICE
+          predicates:
+            - Path=/admin-service/admin/class/**
+          filters:
+            - RewritePath=/admin-service/(?<segment>.*), /$\{segment}
+            - AuthenticationFilter
+            - IsAdminManagerFilter
+        - id: admin-service
+          uri: lb://ADMIN-SERVICE
+          predicates:
+            - Path=/admin-service/admin/**
+            - Method=GET,POST,OPTIONS
+          filters:
+            - RewritePath=/admin-service/(?<segment>.*), /$\{segment}
+            - AuthenticationFilter
+            - IsAdminManagerFilter
+        - id: admin-service
+          uri: lb://ADMIN-SERVICE
+          predicates:
+            - Path=/admin-service/admin/**
+            - Method=PATCH,OPTIONS
+          filters:
+            - RewritePath=/admin-service/(?<segment>.*), /$\{segment}
+            - AuthenticationFilter
+            - IsAdminManagerFilter
+        - id: admin-service
+          uri: lb://ADMIN-SERVICE
+          predicates:
+            - Path=/admin-service/**
+          filters:
+            - RewritePath=/admin-service/(?<segment>.*), /$\{segment}
+            - AuthenticationFilter
+        - id: admin-service
+          uri: lb://ADMIN-SERVICE
+          predicates:
+            - Path=/admin-service/**
+          filters:
+            - RewritePath=/admin-service/(?<segment>.*), /$\{segment}
+            - AuthenticationFilter
+
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/member/signup
+          filters:
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+        - id: user-service
+          uri: lb://USER-SERVICE
+          predicates:
+            - Path=/user-service/**
+          filters:
+            - RewritePath=/user-service/(?<segment>.*), /$\{segment}
+            - AuthenticationFilter
+
+        - id: authentication-service
+          uri: lb://AUTHENTICATION-SERVICE
+          predicates:
+            - Path=/authentication-service/oauth/**,/authentication-service/auth/**
+          filters:
+            - RewritePath=/authentication-service/(?<segment>.*), /$\{segment}
+        - id: authentication-service
+          uri: lb://AUTHENTICATION-SERVICE
+          predicates:
+            - Path=/authentication-service/auth/invitation
+          filters:
+            - RewritePath=/authentication-service/(?<segment>.*), /$\{segment}
+            - AuthenticationFilter
+
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/notification-service/notifications/subscription
+          filters:
+            - RewritePath=/notification-service/(?<segment>.*), /$\{segment}
+            - SocketAuthenticationFilter
+        - id: notification-service
+          uri: lb://NOTIFICATION-SERVICE
+          predicates:
+            - Path=/notification-service/**
+          filters:
+            - RewritePath=/notification-service/(?<segment>.*), /$\{segment}
+            - AuthenticationFilter
+
+        - id: board-service
+          uri: lb://BOARD-SERVICE
+          predicates:
+            - Path=/board-service/**
+            - Method=PUT,POST,DELETE,PATCH,OPTIONS
+          filters:
+            - RewritePath=/board-service/(?<segment>.*), /$\{segment}
+            - AuthenticationFilter
+        - id: board-service
+          uri: lb://BOARD-SERVICE
+          predicates:
+            - Path=/board-service/board/devlog/detail,/board-service/board/alumni/detail,/board-service/board/community/detail,/board-service/board/senior/detail
+          filters:
+            - RewritePath=/board-service/(?<segment>.*), /$\{segment}
+            - TokenParseFilter
+        - id: board-service
+          uri: lb://BOARD-SERVICE
+          predicates:
+            - Path=/board-service/**
+            - Method=GET,OPTIONS
+          filters:
+            - RewritePath=/board-service/(?<segment>.*), /$\{segment}
+
+        - id: file-service
+          uri: lb://FILE-SERVICE
+          predicates:
+            - Path=/file-service/**
+          filters:
+            - RewritePath=/file-service/(?<segment>.*), /$\{segment}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+
+jwt:
+  secret: clzEbe2fQH7WrBMoj5uq/BHiSCQb/S2iyFU6mhJPWVI=
+
+logging:
+  level:
+    org.springframework.cloud.gateway: DEBUG

@@ -52,6 +52,10 @@ public class JwtUtil {
         return claims.get("member_authority", String.class);
     }
 
+    public boolean isExpired(Claims claims) {
+        return claims.getExpiration().getTime() < System.currentTimeMillis();
+    }
+
     public void addJwtPayloadHeaders(ServerHttpRequest request, Claims claims) {
         request.mutate()
                 .header("Content-Type", "application/json;charset=UTF-8")
