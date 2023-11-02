@@ -31,7 +31,7 @@ public class TokenParseFilter extends AbstractGatewayFilterFactory<TokenParseFil
             ServerHttpRequest request = exchange.getRequest();
             ServerHttpResponse response = exchange.getResponse();
 
-            if(FilterUtil.containsAuthorizationHeader(request) && !FilterUtil.getJwt(request).equals("null")) {
+            if(FilterUtil.containsAuthorizationHeader(request) && !FilterUtil.getJwt(request).equals(" null")) {
                 Claims claims;
                 try {
                     claims = jwtUtil.parse(FilterUtil.getJwt(request));
