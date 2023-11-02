@@ -3,6 +3,8 @@ package com.bitbox.gateway.filter;
 import com.bitbox.gateway.util.FilterUtil;
 import com.bitbox.gateway.util.JwtUtil;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpStatus;
@@ -34,8 +36,10 @@ public class AuthenticationFilter extends AbstractGatewayFilterFactory<Authentic
                 return FilterUtil.onError(response, HttpStatus.UNAUTHORIZED);
             }
 
-            Claims claims = jwtUtil.parse(FilterUtil.getJwt(request));
-            if(jwtUtil.isExpired(claims)) {
+            Claims claims;
+            try {
+                claims = jwtUtil.parse(FilterUtil.getJwt(request));
+            } catch (MalformedJwtException | ExpiredJwtException e) {
                 return FilterUtil.onError(response, HttpStatus.UNAUTHORIZED);
             }
 

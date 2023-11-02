@@ -3,6 +3,8 @@ package com.bitbox.gateway.filter;
 import com.bitbox.gateway.util.FilterUtil;
 import com.bitbox.gateway.util.JwtUtil;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.ExpiredJwtException;
+import io.jsonwebtoken.MalformedJwtException;
 import org.springframework.cloud.gateway.filter.GatewayFilter;
 import org.springframework.cloud.gateway.filter.factory.AbstractGatewayFilterFactory;
 import org.springframework.http.HttpStatus;
@@ -29,10 +31,12 @@ public class TokenParseFilter extends AbstractGatewayFilterFactory<TokenParseFil
             ServerHttpRequest request = exchange.getRequest();
             ServerHttpResponse response = exchange.getResponse();
 
-            // 로그인 시에만 토큰 Parse
+            // 로그인 시에만 토큰 Parse -> Authorization: Bearer null
             if(FilterUtil.containsAuthorizationHeader(request) && !FilterUtil.getJwt(request).isEmpty())  {
-                Claims claims = jwtUtil.parse(FilterUtil.getJwt(request));
-                if(jwtUtil.isExpired(claims)) {
+                Claims claims;
+                try {
+                    claims = jwtUtil.parse(FilterUtil.getJwt(request));
+                } catch(ExpiredJwtException e) {
                     return FilterUtil.onError(response, HttpStatus.UNAUTHORIZED);
                 }
 
