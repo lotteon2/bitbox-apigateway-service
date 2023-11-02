@@ -18,10 +18,10 @@ public class FilterUtil {
     }
 
     public static String getHeaderMemberAuthority(ServerHttpRequest request) {
-        return request.getHeaders().get("memberAuthority").get(0);
+        return request.getHeaders().getFirst("memberAuthority");
     }
 
     public static String getJwt(ServerHttpRequest request) {
-        return request.getHeaders().get(HttpHeaders.AUTHORIZATION).get(0).replace("Bearer", "");
+        return request.getHeaders().getFirst(HttpHeaders.AUTHORIZATION).replace("Bearer", "");
     }
 }
