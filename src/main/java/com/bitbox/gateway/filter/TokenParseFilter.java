@@ -31,12 +31,11 @@ public class TokenParseFilter extends AbstractGatewayFilterFactory<TokenParseFil
             ServerHttpRequest request = exchange.getRequest();
             ServerHttpResponse response = exchange.getResponse();
 
-            // 로그인 시에만 토큰 Parse -> Authorization: Bearer null
-            if(FilterUtil.containsAuthorizationHeader(request) && !FilterUtil.getJwt(request).isEmpty())  {
+            if(FilterUtil.containsAuthorizationHeader(request) && !FilterUtil.getJwt(request).equals("null")) {
                 Claims claims;
                 try {
                     claims = jwtUtil.parse(FilterUtil.getJwt(request));
-                } catch(ExpiredJwtException e) {
+                } catch(ExpiredJwtException | MalformedJwtException e) {
                     return FilterUtil.onError(response, HttpStatus.UNAUTHORIZED);
                 }
 
